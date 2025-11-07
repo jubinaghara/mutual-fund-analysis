@@ -17,9 +17,37 @@ const loadingIndicator = document.getElementById('loadingIndicator');
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', async () => {
+    // Check if we should show landing page or analysis page
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('page') === 'analysis') {
+        showAnalysisPage();
+    }
+    
     await loadAllFunds();
     setupEventListeners();
 });
+
+// Navigation functions
+function showLandingPage() {
+    document.getElementById('landingPage').classList.remove('hidden');
+    document.getElementById('analysisPage').classList.add('hidden');
+    window.history.pushState({}, '', window.location.pathname);
+}
+
+function showAnalysisPage() {
+    document.getElementById('landingPage').classList.add('hidden');
+    document.getElementById('analysisPage').classList.remove('hidden');
+    window.history.pushState({}, '', window.location.pathname + '?page=analysis');
+}
+
+function scrollToFeatures() {
+    document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Make navigation functions globally available
+window.showLandingPage = showLandingPage;
+window.showAnalysisPage = showAnalysisPage;
+window.scrollToFeatures = scrollToFeatures;
 
 // Load all mutual funds from API
 async function loadAllFunds() {
@@ -68,7 +96,7 @@ function renderFundList(funds) {
 
     fundList.innerHTML = funds.slice(0, 50).map(fund => `
         <div 
-            class="p-3 border-b border-gray-200 hover:bg-blue-50 cursor-pointer transition-colors fund-card"
+            class="p-3 border-b border-gray-200 hover:bg-material-blue/5 cursor-pointer transition-colors fund-card"
             onclick="selectFund('${fund.schemeCode}', '${fund.schemeName?.replace(/'/g, "\\'")}')"
         >
             <div class="flex items-center justify-between">
@@ -76,7 +104,7 @@ function renderFundList(funds) {
                     <p class="font-medium text-gray-800">${fund.schemeName || 'N/A'}</p>
                     <p class="text-sm text-gray-500">Code: ${fund.schemeCode}</p>
                 </div>
-                <span class="material-icons text-blue-600">add_circle</span>
+                <span class="material-icons text-material-blue">add_circle</span>
             </div>
         </div>
     `).join('');
@@ -121,8 +149,8 @@ function removeFund(schemeCode) {
 // Render selected funds
 function renderSelectedFunds() {
     selectedFundsContainer.innerHTML = selectedFunds.map(fund => `
-        <div class="bg-blue-100 border-2 border-blue-300 rounded-lg px-4 py-2 flex items-center gap-3">
-            <span class="font-medium text-blue-800">${fund.name}</span>
+        <div class="bg-material-green/10 border-2 border-material-green/30 rounded-lg px-4 py-2 flex items-center gap-3">
+            <span class="font-medium text-gray-800 text-sm">${fund.name}</span>
             <button 
                 onclick="removeFund('${fund.code}')"
                 class="text-red-600 hover:text-red-800 transition-colors"
@@ -166,12 +194,94 @@ async function loadFundData(schemeCode) {
         // Calculate metrics from NAV data
         const metrics = calculateMetrics(navData);
         
+        // Get latest NAV by finding the entry with the most recent date
+        let latestNAV = 0;
+        if (navData.data && navData.data.length > 0) {
+            // Parse all data entries with dates and NAV values
+            const dataWithDates = navData.data
+                .map(item => {
+                    const nav = typeof item === 'object' 
+                        ? parseFloat(item.nav || item.NAV || item.value || 0)
+                        : parseFloat(item);
+                    const dateStr = typeof item === 'object' 
+                        ? (item.date || item.Date || item.DATE || '')
+                        : '';
+                    
+                    // Parse date - handle different formats
+                    let date = null;
+                    if (dateStr) {
+                        // Try parsing as ISO date first (YYYY-MM-DD)
+                        date = new Date(dateStr);
+                        // If invalid, try DD-MM-YYYY format
+                        if (isNaN(date.getTime()) && dateStr.includes('-')) {
+                            const parts = dateStr.split('-');
+                            if (parts.length === 3) {
+                                // Try DD-MM-YYYY
+                                date = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+                            }
+                        }
+                    }
+                    
+                    return { nav, date, dateStr, original: item };
+                })
+                .filter(item => !isNaN(item.nav) && item.nav > 0);
+            
+            if (dataWithDates.length > 0) {
+                // Sort by date (most recent first) if dates are available
+                const hasValidDates = dataWithDates.some(item => item.date && !isNaN(item.date.getTime()));
+                
+                if (hasValidDates) {
+                    dataWithDates.sort((a, b) => {
+                        const dateA = a.date ? a.date.getTime() : 0;
+                        const dateB = b.date ? b.date.getTime() : 0;
+                        return dateB - dateA; // Most recent first
+                    });
+                } else {
+                    // If no valid dates, assume data is already sorted (newest last or oldest first)
+                    // Check both ends - typically newer NAVs are higher for growing funds
+                    // But to be safe, we'll check if last element seems more recent
+                    // For now, use the last element as it's typically the most recent in API responses
+                    dataWithDates.reverse(); // Reverse to get last element first
+                }
+                
+                latestNAV = dataWithDates[0].nav;
+            }
+        }
+        
+        // Fallback: Check meta for latest NAV if available
+        if (latestNAV === 0 && navData.meta) {
+            const metaNav = parseFloat(navData.meta.latest_nav || navData.meta.latestNAV || navData.meta.nav || 0);
+            if (metaNav > 0) {
+                latestNAV = metaNav;
+            }
+        }
+        
+        // Try to get AUM from meta or calculate from NAV data
+        let aum = 0;
+        if (navData.meta) {
+            // Try different possible fields for AUM
+            const aumFields = ['aum', 'AUM', 'fund_size', 'fundSize', 'assets', 'total_assets'];
+            for (const field of aumFields) {
+                if (navData.meta[field]) {
+                    aum = parseFloat(navData.meta[field]) || 0;
+                    break;
+                }
+            }
+        }
+        
+        // If AUM not found, try to estimate (this is a fallback)
+        if (aum === 0 && latestNAV > 0) {
+            // Some funds might have AUM in different format, but we'll leave it as 0 if not available
+        }
+        
         const fundData = {
             code: schemeCode,
             name: selectedFunds.find(f => f.code === schemeCode)?.name || navData.meta?.scheme_name || 'Unknown',
             nav: navData.data || [],
             meta: navData.meta || {},
-            ...metrics
+            latestNAV: latestNAV,
+            ...metrics,
+            aum: aum || metrics.aum // Use calculated AUM if meta AUM is not available
         };
         
         fundDataCache[schemeCode] = fundData;
@@ -191,6 +301,7 @@ async function loadFundData(schemeCode) {
         return {
             code: schemeCode,
             name: selectedFunds.find(f => f.code === schemeCode)?.name || 'Unknown',
+            latestNAV: 0,
             cagr: 0,
             cagr3y: 0,
             aum: 0,
@@ -383,10 +494,10 @@ async function updateComparison() {
     // Show loading state
     comparisonTableBody.innerHTML = `
         <tr>
-            <td colspan="12" class="px-4 py-8 text-center">
+            <td colspan="13" class="px-4 py-8 text-center">
                 <div class="flex flex-col items-center gap-2">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    <p class="text-gray-500">Loading comparison data...</p>
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-material-blue"></div>
+                    <p class="text-gray-600">Loading comparison data...</p>
                 </div>
             </td>
         </tr>
@@ -403,7 +514,7 @@ async function updateComparison() {
     if (validFundData.length === 0) {
         comparisonTableBody.innerHTML = `
             <tr>
-                <td colspan="12" class="px-4 py-8 text-center text-gray-500">
+                <td colspan="13" class="px-4 py-8 text-center text-gray-600">
                     <span class="material-icons text-4xl mb-2">info</span>
                     <p>No valid data available for comparison</p>
                 </td>
@@ -430,52 +541,57 @@ function renderComparisonTable(fundDataList) {
         
         return `
             <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
-                <td class="px-3 py-3">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xl font-bold text-gray-400">#${index + 1}</span>
+                <td class="px-2 sm:px-3 py-2 sm:py-3">
+                    <div class="flex items-center gap-1 sm:gap-2">
+                        <span class="text-base sm:text-lg font-bold text-gray-400">#${index + 1}</span>
                         <div class="min-w-0">
-                            <p class="font-medium text-gray-800 text-sm truncate" title="${fund.name}">${fund.name.length > 25 ? fund.name.substring(0, 25) + '...' : fund.name}</p>
-                            <p class="text-xs text-gray-500">${fund.code} • ${fund.period || 'N/A'}</p>
+                            <p class="font-medium text-gray-800 text-xs sm:text-sm truncate" title="${fund.name}">${fund.name.length > (window.innerWidth < 640 ? 20 : 25) ? fund.name.substring(0, (window.innerWidth < 640 ? 20 : 25)) + '...' : fund.name}</p>
+                            <p class="text-xs text-gray-500 hidden sm:block">${fund.code} • ${fund.period || 'N/A'}</p>
                         </div>
                     </div>
                 </td>
-                <td class="px-2 py-3 text-center">
-                    <span class="font-semibold text-sm ${fund.cagr3y >= 0 ? 'text-green-600' : 'text-red-600'}" title="3-Year CAGR">
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center">
+                    <span class="font-semibold text-xs sm:text-sm text-gray-800" title="Latest NAV">
+                        ₹${fund.latestNAV > 0 ? fund.latestNAV.toFixed(2) : 'N/A'}
+                    </span>
+                </td>
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center">
+                    <span class="font-semibold text-xs sm:text-sm ${fund.cagr3y >= 0 ? 'text-material-green' : 'text-red-600'}" title="3-Year CAGR">
                         ${fund.cagr3y > 0 ? '+' : ''}${fund.cagr3y.toFixed(2)}%
                     </span>
                 </td>
-                <td class="px-2 py-3 text-center text-gray-700 text-sm">
-                    ${fund.aum > 0 ? fund.aum.toLocaleString('en-IN') : 'N/A'}
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center text-gray-600 text-xs sm:text-sm hidden sm:table-cell">
+                    ${fund.aum > 0 ? fund.aum.toLocaleString('en-IN') + ' Cr' : 'N/A'}
                 </td>
-                <td class="px-2 py-3 text-center text-gray-700 text-sm">
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center text-gray-600 text-xs sm:text-sm">
                     ${fund.beta.toFixed(2)}
                 </td>
-                <td class="px-2 py-3 text-center">
-                    <span class="font-semibold text-sm ${fund.alpha > 0 ? 'text-green-600' : 'text-red-600'}" title="Alpha (excess return)">
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center">
+                    <span class="font-semibold text-xs sm:text-sm ${fund.alpha > 0 ? 'text-material-green' : 'text-red-600'}" title="Alpha (excess return)">
                         ${fund.alpha > 0 ? '+' : ''}${fund.alpha.toFixed(2)}%
                     </span>
                 </td>
-                <td class="px-2 py-3 text-center">
-                    <span class="font-semibold text-sm ${fund.sharpe > 1 ? 'text-green-600' : fund.sharpe > 0 ? 'text-yellow-600' : 'text-red-600'}" title="Sharpe Ratio (3Y)">
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center">
+                    <span class="font-semibold text-xs sm:text-sm ${fund.sharpe > 1 ? 'text-material-green' : fund.sharpe > 0 ? 'text-material-amber' : 'text-red-600'}" title="Sharpe Ratio (3Y)">
                         ${fund.sharpe.toFixed(2)}
                     </span>
                 </td>
-                <td class="px-2 py-3 text-center">
-                    <span class="font-semibold text-sm ${fund.sortino > 1 ? 'text-green-600' : fund.sortino > 0 ? 'text-yellow-600' : 'text-red-600'}" title="Sortino Ratio (3Y)">
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center hidden md:table-cell">
+                    <span class="font-semibold text-xs sm:text-sm ${fund.sortino > 1 ? 'text-material-green' : fund.sortino > 0 ? 'text-material-amber' : 'text-red-600'}" title="Sortino Ratio (3Y)">
                         ${fund.sortino.toFixed(2)}
                     </span>
                 </td>
-                <td class="px-2 py-3 text-center text-gray-700 text-sm" title="Treynor Ratio (3Y)">
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center text-gray-600 text-xs sm:text-sm hidden lg:table-cell" title="Treynor Ratio (3Y)">
                     ${fund.treynor.toFixed(2)}
                 </td>
-                <td class="px-2 py-3 text-center text-gray-700 text-sm" title="Maximum Drawdown">
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center text-gray-600 text-xs sm:text-sm hidden md:table-cell" title="Maximum Drawdown">
                     ${fund.maxDrawdown.toFixed(2)}%
                 </td>
-                <td class="px-2 py-3 text-center text-gray-700 text-sm" title="Standard Deviation (3Y)">
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center text-gray-600 text-xs sm:text-sm hidden lg:table-cell" title="Standard Deviation (3Y)">
                     ${fund.stdDev.toFixed(2)}%
                 </td>
-                <td class="px-2 py-3 text-center">
-                    <span class="inline-block px-2 py-1 rounded-full text-white text-xs font-medium ${performanceClass}">
+                <td class="px-1 sm:px-2 py-2 sm:py-3 text-center">
+                    <span class="inline-block px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-white text-xs font-medium ${performanceClass}">
                         ${performance.label}
                     </span>
                 </td>
@@ -523,24 +639,26 @@ function renderCAGRChart(fundDataList) {
         return;
     }
     
+    const isMobile = window.innerWidth < 640;
+    const maxNameLength = isMobile ? 20 : 30;
     const chartHTML = `
-        <div class="space-y-3">
+        <div class="space-y-2 sm:space-y-3">
             ${sorted.map(fund => {
                 const width = Math.min(100, (Math.abs(fund.cagr3y) / maxCAGR) * 100);
                 const color = fund.cagr3y >= 0 ? 'bg-green-500' : 'bg-red-500';
-                const displayName = fund.name.length > 30 ? fund.name.substring(0, 30) + '...' : fund.name;
+                const displayName = fund.name.length > maxNameLength ? fund.name.substring(0, maxNameLength) + '...' : fund.name;
                 
                 return `
                     <div>
                         <div class="flex justify-between mb-1">
-                            <span class="text-sm font-medium text-gray-700 truncate flex-1" title="${fund.name}">${displayName}</span>
-                            <span class="text-sm font-semibold ${fund.cagr3y >= 0 ? 'text-green-600' : 'text-red-600'} ml-2 whitespace-nowrap">
+                            <span class="text-xs sm:text-sm font-medium text-gray-700 truncate flex-1" title="${fund.name}">${displayName}</span>
+                            <span class="text-xs sm:text-sm font-semibold ${fund.cagr3y >= 0 ? 'text-green-600' : 'text-red-600'} ml-2 whitespace-nowrap">
                                 ${fund.cagr3y > 0 ? '+' : ''}${fund.cagr3y.toFixed(2)}%
                             </span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
-                            <div class="chart-bar ${color} h-6 rounded-full flex items-center justify-end pr-2" style="width: ${width}%">
-                                ${width > 15 ? '<span class="text-white text-xs font-medium">' + fund.cagr3y.toFixed(2) + '%</span>' : ''}
+                        <div class="w-full bg-gray-200 rounded-full h-5 sm:h-6 overflow-hidden">
+                            <div class="chart-bar ${color} h-5 sm:h-6 rounded-full flex items-center justify-end pr-1 sm:pr-2" style="width: ${width}%">
+                                ${width > 20 ? '<span class="text-white text-xs font-medium">' + fund.cagr3y.toFixed(2) + '%</span>' : ''}
                             </div>
                         </div>
                     </div>
@@ -567,8 +685,10 @@ function renderSharpeChart(fundDataList) {
         return;
     }
     
+    const isMobile = window.innerWidth < 640;
+    const maxNameLength = isMobile ? 20 : 30;
     const chartHTML = `
-        <div class="space-y-3">
+        <div class="space-y-2 sm:space-y-3">
             ${sorted.map(fund => {
                 const width = Math.min(100, (Math.abs(fund.sharpe) / maxSharpe) * 100);
                 let color = 'bg-gray-500';
@@ -576,19 +696,19 @@ function renderSharpeChart(fundDataList) {
                 else if (fund.sharpe > 0) color = 'bg-yellow-500';
                 else color = 'bg-red-500';
                 
-                const displayName = fund.name.length > 30 ? fund.name.substring(0, 30) + '...' : fund.name;
+                const displayName = fund.name.length > maxNameLength ? fund.name.substring(0, maxNameLength) + '...' : fund.name;
                 
                 return `
                     <div>
                         <div class="flex justify-between mb-1">
-                            <span class="text-sm font-medium text-gray-700 truncate flex-1" title="${fund.name}">${displayName}</span>
-                            <span class="text-sm font-semibold ${fund.sharpe > 1 ? 'text-green-600' : fund.sharpe > 0 ? 'text-yellow-600' : 'text-red-600'} ml-2 whitespace-nowrap">
+                            <span class="text-xs sm:text-sm font-medium text-gray-700 truncate flex-1" title="${fund.name}">${displayName}</span>
+                            <span class="text-xs sm:text-sm font-semibold ${fund.sharpe > 1 ? 'text-green-600' : fund.sharpe > 0 ? 'text-yellow-600' : 'text-red-600'} ml-2 whitespace-nowrap">
                                 ${fund.sharpe.toFixed(2)}
                             </span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
-                            <div class="chart-bar ${color} h-6 rounded-full flex items-center justify-end pr-2" style="width: ${width}%">
-                                ${width > 15 ? '<span class="text-white text-xs font-medium">' + fund.sharpe.toFixed(2) + '</span>' : ''}
+                        <div class="w-full bg-gray-200 rounded-full h-5 sm:h-6 overflow-hidden">
+                            <div class="chart-bar ${color} h-5 sm:h-6 rounded-full flex items-center justify-end pr-1 sm:pr-2" style="width: ${width}%">
+                                ${width > 20 ? '<span class="text-white text-xs font-medium">' + fund.sharpe.toFixed(2) + '</span>' : ''}
                             </div>
                         </div>
                     </div>
@@ -615,24 +735,26 @@ function renderAlphaChart(fundDataList) {
         return;
     }
     
+    const isMobile = window.innerWidth < 640;
+    const maxNameLength = isMobile ? 20 : 30;
     const chartHTML = `
-        <div class="space-y-3">
+        <div class="space-y-2 sm:space-y-3">
             ${sorted.map(fund => {
                 const width = Math.min(100, (Math.abs(fund.alpha) / maxAlpha) * 100);
                 const color = fund.alpha > 0 ? 'bg-green-500' : 'bg-red-500';
-                const displayName = fund.name.length > 30 ? fund.name.substring(0, 30) + '...' : fund.name;
+                const displayName = fund.name.length > maxNameLength ? fund.name.substring(0, maxNameLength) + '...' : fund.name;
                 
                 return `
                     <div>
                         <div class="flex justify-between mb-1">
-                            <span class="text-sm font-medium text-gray-700 truncate flex-1" title="${fund.name}">${displayName}</span>
-                            <span class="text-sm font-semibold ${fund.alpha > 0 ? 'text-green-600' : 'text-red-600'} ml-2 whitespace-nowrap">
+                            <span class="text-xs sm:text-sm font-medium text-gray-700 truncate flex-1" title="${fund.name}">${displayName}</span>
+                            <span class="text-xs sm:text-sm font-semibold ${fund.alpha > 0 ? 'text-green-600' : 'text-red-600'} ml-2 whitespace-nowrap">
                                 ${fund.alpha > 0 ? '+' : ''}${fund.alpha.toFixed(2)}%
                             </span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
-                            <div class="chart-bar ${color} h-6 rounded-full flex items-center justify-end pr-2" style="width: ${width}%">
-                                ${width > 15 ? '<span class="text-white text-xs font-medium">' + fund.alpha.toFixed(2) + '%</span>' : ''}
+                        <div class="w-full bg-gray-200 rounded-full h-5 sm:h-6 overflow-hidden">
+                            <div class="chart-bar ${color} h-5 sm:h-6 rounded-full flex items-center justify-end pr-1 sm:pr-2" style="width: ${width}%">
+                                ${width > 20 ? '<span class="text-white text-xs font-medium">' + fund.alpha.toFixed(2) + '%</span>' : ''}
                             </div>
                         </div>
                     </div>
@@ -659,8 +781,10 @@ function renderDrawdownChart(fundDataList) {
         return;
     }
     
+    const isMobile = window.innerWidth < 640;
+    const maxNameLength = isMobile ? 20 : 30;
     const chartHTML = `
-        <div class="space-y-3">
+        <div class="space-y-2 sm:space-y-3">
             ${sorted.map(fund => {
                 const width = Math.min(100, (fund.maxDrawdown / maxDD) * 100);
                 let color = 'bg-green-500';
@@ -668,19 +792,19 @@ function renderDrawdownChart(fundDataList) {
                 else if (fund.maxDrawdown > 20) color = 'bg-yellow-500';
                 else if (fund.maxDrawdown > 10) color = 'bg-orange-500';
                 
-                const displayName = fund.name.length > 30 ? fund.name.substring(0, 30) + '...' : fund.name;
+                const displayName = fund.name.length > maxNameLength ? fund.name.substring(0, maxNameLength) + '...' : fund.name;
                 
                 return `
                     <div>
                         <div class="flex justify-between mb-1">
-                            <span class="text-sm font-medium text-gray-700 truncate flex-1" title="${fund.name}">${displayName}</span>
-                            <span class="text-sm font-semibold ${fund.maxDrawdown > 30 ? 'text-red-600' : fund.maxDrawdown > 20 ? 'text-yellow-600' : 'text-green-600'} ml-2 whitespace-nowrap">
+                            <span class="text-xs sm:text-sm font-medium text-gray-700 truncate flex-1" title="${fund.name}">${displayName}</span>
+                            <span class="text-xs sm:text-sm font-semibold ${fund.maxDrawdown > 30 ? 'text-red-600' : fund.maxDrawdown > 20 ? 'text-yellow-600' : 'text-green-600'} ml-2 whitespace-nowrap">
                                 ${fund.maxDrawdown.toFixed(2)}%
                             </span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-6 overflow-hidden">
-                            <div class="chart-bar ${color} h-6 rounded-full flex items-center justify-end pr-2" style="width: ${width}%">
-                                ${width > 15 ? '<span class="text-white text-xs font-medium">' + fund.maxDrawdown.toFixed(2) + '%</span>' : ''}
+                        <div class="w-full bg-gray-200 rounded-full h-5 sm:h-6 overflow-hidden">
+                            <div class="chart-bar ${color} h-5 sm:h-6 rounded-full flex items-center justify-end pr-1 sm:pr-2" style="width: ${width}%">
+                                ${width > 20 ? '<span class="text-white text-xs font-medium">' + fund.maxDrawdown.toFixed(2) + '%</span>' : ''}
                             </div>
                         </div>
                     </div>
@@ -704,10 +828,10 @@ function hideLoading() {
 function showNotification(message, type = 'info') {
     // Simple notification - can be enhanced
     const colors = {
-        info: 'bg-blue-500',
-        warning: 'bg-yellow-500',
+        info: 'bg-material-blue',
+        warning: 'bg-material-amber',
         error: 'bg-red-500',
-        success: 'bg-green-500'
+        success: 'bg-material-green'
     };
     
     const notification = document.createElement('div');

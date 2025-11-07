@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Mutual Fund Metrics - Simple Guide | MF Analyzer</title>
+    <meta name="description" content="Simple guide to understand mutual fund metrics like CAGR, Sharpe ratio, Alpha, Beta. Easy explanations for beginners with charts and examples.">
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Google Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="./src/style.css">
+    
+    <style>
+        .metric-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+        .analogy-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 4px solid #3b82f6;
+        }
+        .tip-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+        }
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin: 15px 0;
+        }
+        @media (min-width: 640px) {
+            .chart-container {
+                height: 300px;
+                margin: 20px 0;
+            }
+        }
+        .decision-guide-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50" style="font-family: 'Inter', sans-serif;">
+    <!-- Navigation -->
+    <nav class="bg-white/95 backdrop-blur-sm shadow-md border-b border-gray-200 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-material-indigo to-material-blue rounded-lg flex items-center justify-center shadow-sm">
+                        <svg class="w-6 h-6 sm:w-7 sm:h-7 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-base sm:text-xl font-semibold text-gray-900">MF Analyzer</h1>
+                        <p class="text-xs text-gray-600 hidden sm:block">Metrics Guide</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <a 
+                        href="index.html" 
+                        class="px-3 sm:px-4 py-1.5 sm:py-2 text-gray-600 hover:text-material-blue transition-all duration-300 hover:bg-gray-50 rounded-lg flex items-center gap-1 sm:gap-2"
+                    >
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="text-xs sm:text-sm font-medium hidden sm:inline">Back to Analysis</span>
+                        <span class="text-xs sm:hidden">Back</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="flex-1 flex items-center justify-center py-20 px-4 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        <!-- Decorative background SVG -->
+        <div class="absolute inset-0 opacity-5 pointer-events-none">
+            <svg class="w-full h-full" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 400 Q300 200 600 400 T1200 400" stroke="#387ED1" stroke-width="2" fill="none"/>
+                <path d="M0 500 Q300 300 600 500 T1200 500" stroke="#10b981" stroke-width="2" fill="none"/>
+                <circle cx="200" cy="200" r="3" fill="#387ED1"/>
+                <circle cx="800" cy="300" r="3" fill="#10b981"/>
+                <circle cx="1000" cy="600" r="3" fill="#f59e0b"/>
+            </svg>
+        </div>
+        
+        <div class="container mx-auto max-w-6xl relative z-10">
+            <div class="text-center mb-8 sm:mb-12">
+                <!-- Undraw.co Education Hero Image -->
+                <div class="mb-6 sm:mb-8 flex justify-center">
+                    <svg class="w-full max-w-md sm:max-w-lg md:max-w-2xl h-auto" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="eduGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#387ED1;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#2563EB;stop-opacity:1" />
+                            </linearGradient>
+                            <linearGradient id="eduGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Background decorative elements -->
+                        <circle cx="650" cy="80" r="50" fill="#387ED1" opacity="0.1"/>
+                        <circle cx="150" cy="520" r="70" fill="#10b981" opacity="0.1"/>
+                        
+                        <!-- Person figure (undraw style) -->
+                        <g transform="translate(400, 250)">
+                            <!-- Head -->
+                            <circle cx="0" cy="-100" r="40" fill="#387ED1" opacity="0.2"/>
+                            <!-- Body -->
+                            <rect x="-35" y="-50" width="70" height="120" rx="35" fill="#387ED1" opacity="0.15"/>
+                            <!-- Arms -->
+                            <ellipse cx="-60" cy="10" rx="18" ry="70" fill="#387ED1" opacity="0.15" transform="rotate(-25)"/>
+                            <ellipse cx="60" cy="10" rx="18" ry="70" fill="#387ED1" opacity="0.15" transform="rotate(25)"/>
+                        </g>
+                        
+                        <!-- Book/Notebook -->
+                        <g transform="translate(250, 350)">
+                            <rect x="0" y="0" width="300" height="200" rx="10" fill="white" stroke="#387ED1" stroke-width="3" opacity="0.9"/>
+                            <!-- Book pages -->
+                            <line x1="20" y1="50" x2="280" y2="50" stroke="#387ED1" stroke-width="2" opacity="0.3"/>
+                            <line x1="20" y1="80" x2="280" y2="80" stroke="#387ED1" stroke-width="2" opacity="0.3"/>
+                            <line x1="20" y1="110" x2="250" y2="110" stroke="#387ED1" stroke-width="2" opacity="0.3"/>
+                            <line x1="20" y1="140" x2="280" y2="140" stroke="#387ED1" stroke-width="2" opacity="0.3"/>
+                            <line x1="20" y1="170" x2="200" y2="170" stroke="#387ED1" stroke-width="2" opacity="0.3"/>
+                            <!-- Book binding -->
+                            <rect x="0" y="0" width="15" height="200" fill="#387ED1" opacity="0.2" rx="10"/>
+                        </g>
+                        
+                        <!-- Lightbulb icon -->
+                        <g transform="translate(550, 200)">
+                            <circle cx="0" cy="0" r="50" fill="#10b981" opacity="0.1"/>
+                            <path d="M0 -30 Q-15 -20 -15 -10 Q-15 0 -10 10 L10 10 Q15 0 15 -10 Q15 -20 0 -30 Z" 
+                                  fill="url(#eduGradient2)" opacity="0.8"/>
+                            <rect x="-3" y="10" width="6" height="15" fill="#10b981" opacity="0.6" rx="2"/>
+                            <path d="M-8 25 L8 25 M-5 30 L5 30" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+                        </g>
+                        
+                        <!-- Chart/Graph icon -->
+                        <g transform="translate(150, 200)">
+                            <rect x="-30" y="-30" width="60" height="60" rx="8" fill="#387ED1" opacity="0.1"/>
+                            <path d="M-20 20 L-10 10 L0 15 L10 5 L20 10" 
+                                  stroke="#387ED1" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="-20" cy="20" r="3" fill="#387ED1"/>
+                            <circle cx="-10" cy="10" r="3" fill="#387ED1"/>
+                            <circle cx="0" cy="15" r="3" fill="#387ED1"/>
+                            <circle cx="10" cy="5" r="3" fill="#387ED1"/>
+                            <circle cx="20" cy="10" r="3" fill="#387ED1"/>
+                        </g>
+                        
+                        <!-- Question mark icon -->
+                        <g transform="translate(600, 400)">
+                            <circle cx="0" cy="0" r="35" fill="#387ED1" opacity="0.1"/>
+                            <path d="M0 -20 Q-10 -20 -10 -10 Q-10 0 0 0 Q10 0 10 10" 
+                                  stroke="#387ED1" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <circle cx="0" cy="25" r="3" fill="#387ED1"/>
+                        </g>
+                    </svg>
+                </div>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight text-gray-900 px-2">
+                    Understanding Mutual Fund Metrics
+                </h1>
+                <p class="text-lg sm:text-xl md:text-2xl text-gray-600 mb-3 sm:mb-4 max-w-3xl mx-auto font-medium px-4">
+                    Simple explanations that anyone can understand - from 8 to 80 years old!
+                </p>
+                <p class="text-sm sm:text-base md:text-lg text-gray-500 mb-8 sm:mb-10 max-w-2xl mx-auto px-4">
+                    Learn what each metric means and how to use them to choose the best mutual fund for you.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-3 sm:px-4 py-8 sm:py-12 max-w-6xl">
+        <!-- Introduction -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 mt-4 sm:mt-8 hover:shadow-xl transition-shadow duration-300">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-gray-900 flex items-center gap-2 sm:gap-3">
+                <div class="w-12 h-12 sm:w-16 sm:h-16 bg-material-blue/10 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 sm:w-8 sm:h-8 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                        <path d="M12 8V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.3">
+                            <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                    </svg>
+                </div>
+                Why These Metrics Matter
+            </h2>
+            <p class="text-base sm:text-lg text-gray-700 leading-relaxed mb-3 sm:mb-4">
+                Imagine you're buying a car. You wouldn't just look at the color - you'd check the mileage, safety rating, 
+                and fuel efficiency. Similarly, when choosing a mutual fund, you need to look beyond just returns. 
+                These metrics help you understand:
+            </p>
+            <ul class="list-disc list-inside space-y-2 text-gray-700 text-sm sm:text-base md:text-lg ml-2 sm:ml-4">
+                <li><strong>How much money you can make</strong> (Returns)</li>
+                <li><strong>How risky it is</strong> (Risk)</li>
+                <li><strong>How well it performs compared to others</strong> (Performance)</li>
+                <li><strong>How stable it is</strong> (Volatility)</li>
+            </ul>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="space-y-0">
+            <!-- CAGR -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 metric-card my-6 sm:my-8">
+                <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-material-green/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-material-green/20 transition-colors">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-material-green" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M21 10V6H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">CAGR (Compound Annual Growth Rate)</h2>
+                        <p class="text-base sm:text-lg text-gray-600">The average yearly growth of your investment</p>
+                    </div>
+                </div>
+
+                <div class="analogy-box p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                    <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 18.01L12.01 17.9989" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Think of it like this:
+                    </h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
+                        Imagine you plant a tree. In year 1, it grows 10%. In year 2, it grows 15%. In year 3, it grows 12%. 
+                        CAGR tells you the <strong>average growth rate</strong> over all 3 years. It's like saying 
+                        "This tree grows about 12.3% per year on average."
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">What it means:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Higher is better:</strong> A 15% CAGR means your money grows 15% each year on average</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>3-Year CAGR:</strong> Shows performance over the last 3 years</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Example:</strong> ₹10,000 invested at 12% CAGR becomes ₹14,049 in 3 years</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">How to use it:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Compare CAGR of different funds - higher is usually better</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Look for consistent CAGR over multiple years</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>A good equity fund typically has 12-18% CAGR</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="cagrChart"></canvas>
+                </div>
+            </div>
+
+            <!-- NAV -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 metric-card my-6 sm:my-8">
+                <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-material-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 1V23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M17 5H9.5C8.57174 5 7.6815 5.36875 7.02513 6.02513C6.36875 6.6815 6 7.57174 6 8.5C6 9.42826 6.36875 10.3185 7.02513 10.9749C7.6815 11.6313 8.57174 12 9.5 12H14.5C15.4283 12 16.3185 12.3687 16.9749 13.0251C17.6313 13.6815 18 14.5717 18 15.5C18 16.4283 17.6313 17.3185 16.9749 17.9749C16.3185 18.6313 15.4283 19 14.5 19H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">NAV (Net Asset Value)</h2>
+                        <p class="text-base sm:text-lg text-gray-600">The current price of one unit of the mutual fund</p>
+                    </div>
+                </div>
+
+                <div class="analogy-box p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                    <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 18.01L12.01 17.9989" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Think of it like this:
+                    </h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
+                        NAV is like the <strong>price per slice of a pizza</strong>. If the whole pizza costs ₹100 and has 10 slices, 
+                        each slice costs ₹10. Similarly, if a mutual fund has assets worth ₹1,00,000 and has 1,000 units, 
+                        each unit's NAV is ₹100.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">What it means:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Updated daily:</strong> NAV changes every day based on fund performance</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Not a comparison:</strong> Higher NAV doesn't mean better fund</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>What matters:</strong> How much NAV grows over time, not the absolute value</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">How to use it:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Use NAV to calculate how many units you can buy</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Track NAV over time to see fund performance</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Don't compare NAV values - compare growth rates instead</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AUM -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 metric-card my-6 sm:my-8">
+                <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-material-pink/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-material-pink" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9 22V12H15V22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">AUM (Assets Under Management)</h2>
+                        <p class="text-base sm:text-lg text-gray-600">Total money invested in the fund by all investors</p>
+                    </div>
+                </div>
+
+                <div class="analogy-box p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                    <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 18.01L12.01 17.9989" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Think of it like this:
+                    </h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
+                        AUM is like the <strong>total money in a piggy bank</strong> that many people contribute to. 
+                        If 1,000 people each put ₹10,000, the AUM is ₹1 crore. It shows how much trust investors have 
+                        in the fund.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">What it means:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Popularity indicator:</strong> Higher AUM often means more investors trust it</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Not always better:</strong> Very large AUM can sometimes limit flexibility</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Stability:</strong> Funds with good AUM are usually more stable</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">How to use it:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Look for funds with at least ₹100-500 crores AUM for stability</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Very small AUM (&lt;50 crores) might be risky</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>But don't choose only based on AUM - performance matters more</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beta -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 metric-card my-6 sm:my-8">
+                <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-material-amber/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-material-amber" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Beta</h2>
+                        <p class="text-base sm:text-lg text-gray-600">How much the fund moves compared to the market</p>
+                    </div>
+                </div>
+
+                <div class="analogy-box p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                    <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 18.01L12.01 17.9989" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Think of it like this:
+                    </h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
+                        Beta is like a <strong>speedometer for risk</strong>. If the market (like Nifty) goes up 10%, 
+                        a fund with Beta 1.0 also goes up 10%. A fund with Beta 1.5 goes up 15% (more risky, more reward). 
+                        A fund with Beta 0.8 goes up only 8% (less risky, less reward).
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">What it means:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Beta = 1.0:</strong> Moves exactly like the market (average risk)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Beta &gt; 1.0:</strong> More volatile than market (higher risk, higher reward)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Beta &lt; 1.0:</strong> Less volatile than market (lower risk, lower reward)</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">How to use it:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>If you're young and can take risk: Beta 1.2-1.5 is okay</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>If you're close to retirement: Look for Beta 0.7-0.9 (safer)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Beta 0.8-1.2 is usually a good range for most investors</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="betaChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Alpha -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 metric-card my-6 sm:my-8">
+                <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-material-green/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-material-green" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="currentColor" opacity="0.2"/>
+                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Alpha</h2>
+                        <p class="text-base sm:text-lg text-gray-600">Extra returns the fund manager earns beyond what the market gives</p>
+                    </div>
+                </div>
+
+                <div class="analogy-box p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                    <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 18.01L12.01 17.9989" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Think of it like this:
+                    </h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed mb-3 sm:mb-4">
+                        Imagine a class test where the <strong>average score of all students is 70%</strong>. This average score is like the "market performance" - it's what everyone expects.
+                    </p>
+                    <div class="bg-white/60 rounded-lg p-3 sm:p-4 mb-2 sm:mb-3">
+                        <p class="text-gray-800 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Student A scores 75%</p>
+                        <p class="text-gray-700 text-xs sm:text-sm md:text-base">
+                            Student A's score (75%) - Average score (70%) = <strong class="text-material-green">+5%</strong>
+                        </p>
+                        <p class="text-gray-700 mt-1 sm:mt-2 text-xs sm:text-sm md:text-base">
+                            This means Student A did <strong>5% better than average</strong>. In fund terms, this is <strong>Alpha = +5%</strong> - the fund manager is adding extra value!
+                        </p>
+                    </div>
+                    <div class="bg-white/60 rounded-lg p-3 sm:p-4">
+                        <p class="text-gray-800 font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Student B scores 65%</p>
+                        <p class="text-gray-700 text-xs sm:text-sm md:text-base">
+                            Student B's score (65%) - Average score (70%) = <strong class="text-red-600">-5%</strong>
+                        </p>
+                        <p class="text-gray-700 mt-1 sm:mt-2 text-xs sm:text-sm md:text-base">
+                            This means Student B did <strong>5% worse than average</strong>. In fund terms, this is <strong>Alpha = -5%</strong> - the fund manager is underperforming.
+                        </p>
+                    </div>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed mt-3 sm:mt-4">
+                        <strong>Alpha shows if the fund manager is smarter than average</strong>. Positive Alpha means the manager is adding extra value beyond what the market gives. Negative Alpha means they're underperforming the market.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">What it means:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Positive Alpha:</strong> Fund is beating the market (good!)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Negative Alpha:</strong> Fund is underperforming the market (bad!)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Zero Alpha:</strong> Fund matches market performance (average)</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">How to use it:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Always prefer funds with positive Alpha</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Alpha above 2-3% is considered excellent</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Negative Alpha means the manager isn't adding value - avoid such funds</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="alphaChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Sharpe Ratio -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 metric-card my-6 sm:my-8">
+                <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-material-blue/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 3V21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M3 12H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="16" cy="16" r="2" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Sharpe Ratio</h2>
+                        <p class="text-base sm:text-lg text-gray-600">Reward you get for the risk you take</p>
+                    </div>
+                </div>
+
+                <div class="analogy-box p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                    <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 18.01L12.01 17.9989" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Think of it like this:
+                    </h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
+                        Sharpe Ratio is like a <strong>value-for-money score</strong>. Imagine two restaurants: 
+                        Restaurant A gives you great food (high returns) but costs a lot (high risk). 
+                        Restaurant B gives you good food (decent returns) at a fair price (low risk). 
+                        Sharpe Ratio tells you which gives better value. <strong>Higher Sharpe = Better deal!</strong>
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">What it means:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Sharpe &gt; 1:</strong> Good - you're getting good returns for the risk</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Sharpe &gt; 2:</strong> Excellent - very efficient fund</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Sharpe &lt; 1:</strong> Not great - too much risk for the returns</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">How to use it:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Compare Sharpe Ratios - higher is always better</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Look for funds with Sharpe &gt; 1.5 for good risk-adjusted returns</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>This is one of the most important metrics - don't ignore it!</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="sharpeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Sortino Ratio -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 metric-card my-6 sm:my-8">
+                <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-material-purple/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Sortino Ratio</h2>
+                        <p class="text-base sm:text-lg text-gray-600">Like Sharpe, but only looks at bad risk (downside)</p>
+                    </div>
+                </div>
+
+                <div class="analogy-box p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                    <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 18.01L12.01 17.9989" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Think of it like this:
+                    </h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
+                        Sortino is like Sharpe's smarter cousin. While Sharpe worries about all ups and downs, 
+                        <strong>Sortino only worries about losses</strong>. It's like rating a car's safety - you care 
+                        about how it handles crashes (downsides), not how fast it goes (upsides). Higher Sortino = 
+                        Better protection against losses!
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">What it means:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Focuses on downside:</strong> Only counts bad volatility (losses)</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Better than Sharpe:</strong> More accurate for most investors</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Higher is better:</strong> Shows good returns with less downside risk</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">How to use it:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Use Sortino along with Sharpe for complete picture</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Sortino &gt; 1.5 is good, &gt; 2.0 is excellent</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>If you're risk-averse, prioritize Sortino over Sharpe</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Treynor Ratio -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 metric-card my-6 sm:my-8">
+                <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-material-indigo/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-material-indigo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M21 3H12M21 3L16 8M21 3V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Treynor Ratio</h2>
+                        <p class="text-base sm:text-lg text-gray-600">Returns per unit of market risk (Beta)</p>
+                    </div>
+                </div>
+
+                <div class="analogy-box p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                    <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 18.01L12.01 17.9989" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Think of it like this:
+                    </h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
+                        Treynor Ratio is like <strong>miles per gallon for risk</strong>. If two cars both use 1 gallon of fuel, 
+                        but Car A goes 30 miles and Car B goes 25 miles, Car A is more efficient. Similarly, if two funds 
+                        both have Beta 1.0 (same market risk), but Fund A gives 15% returns and Fund B gives 12% returns, 
+                        Fund A has a better Treynor Ratio.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">What it means:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Efficiency metric:</strong> How well fund uses market risk</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Higher is better:</strong> More returns for same level of market risk</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Uses Beta:</strong> Only considers market risk, not total risk</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">How to use it:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Compare funds with similar Beta values</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Treynor &gt; 5 is good, &gt; 10 is excellent</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Use along with Sharpe and Sortino for complete analysis</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maximum Drawdown -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 metric-card my-6 sm:my-8">
+                <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-red-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 9V13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M10.29 3.86L1.82 18C1.64547 18.3024 1.55299 18.6453 1.55201 18.9945C1.55103 19.3437 1.64157 19.6871 1.81445 19.9905C1.98733 20.2939 2.23675 20.5467 2.53771 20.7238C2.83868 20.9009 3.18082 20.9962 3.53 21H20.47C20.8192 20.9962 21.1613 20.9009 21.4623 20.7238C21.7633 20.5467 22.0127 20.2939 22.1856 19.9905C22.3584 19.6871 22.449 19.3437 22.448 18.9945C22.447 18.6453 22.3545 18.3024 22.18 18L13.71 3.86C13.5318 3.56631 13.2807 3.32311 12.9812 3.15448C12.6817 2.98585 12.3438 2.89725 12 2.89725C11.6562 2.89725 11.3183 2.98585 11.0188 3.15448C10.7193 3.32311 10.4682 3.56631 10.29 3.86Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Maximum Drawdown</h2>
+                        <p class="text-base sm:text-lg text-gray-600">The biggest drop from peak to bottom</p>
+                    </div>
+                </div>
+
+                <div class="analogy-box p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                    <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 18.01L12.01 17.9989" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Think of it like this:
+                    </h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
+                        Maximum Drawdown is like the <strong>biggest fall you've ever had</strong>. If you climbed a hill 
+                        that's 100 meters high, but then fell down 30 meters before climbing back up, your maximum drawdown 
+                        is 30%. It shows the worst-case scenario - how much you could lose at the worst moment. 
+                        <strong>Lower is better!</strong>
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">What it means:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Worst-case scenario:</strong> Biggest loss from highest point</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Lower is better:</strong> 10% drawdown is better than 30%</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Shows resilience:</strong> How well fund recovers from losses</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">How to use it:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Look for drawdown &lt; 20% for safer funds</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Drawdown &gt; 40% is very risky - avoid if you can't handle it</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Check if fund recovered quickly after drawdown</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="drawdownChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Standard Deviation -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 metric-card my-6 sm:my-8">
+                <div class="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-gray-700" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3V21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M7 16L12 11L16 15L21 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Standard Deviation</h2>
+                        <p class="text-base sm:text-lg text-gray-600">How much the fund's returns jump around (volatility)</p>
+                    </div>
+                </div>
+
+                <div class="analogy-box p-4 sm:p-6 rounded-lg mb-4 sm:mb-6">
+                    <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-material-blue" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <path d="M9 9C9 5.49997 14.5 5.5 14.5 9C14.5 11.5 12 10.9999 12 13.9999" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M12 18.01L12.01 17.9989" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Think of it like this:
+                    </h3>
+                    <p class="text-gray-700 text-sm sm:text-base md:text-lg leading-relaxed">
+                        Standard Deviation is like measuring how <strong>bumpy a road is</strong>. A smooth highway has low 
+                        standard deviation (returns are steady). A rocky mountain path has high standard deviation 
+                        (returns jump up and down a lot). Lower standard deviation = smoother ride = less stress!
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">What it means:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Volatility measure:</strong> How much returns fluctuate</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Lower is better:</strong> More stable, predictable returns</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span><strong>Typical range:</strong> 10-20% for equity funds</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3">How to use it:</h3>
+                        <ul class="space-y-2 text-gray-700 text-sm sm:text-base">
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-0.5 sm:mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>If you want stability: Look for Std Dev &lt; 15%</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>If you can handle risk: Std Dev 15-25% is okay</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-material-blue flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <span>Std Dev &gt; 25% is very volatile - only for aggressive investors</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="stdDevChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Decision Guide -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-4 sm:p-6 md:p-8 mt-8 sm:mt-12 mb-6 sm:mb-8">
+            <div class="text-center mb-4 sm:mb-6">
+                <div class="inline-block mb-3 sm:mb-4">
+                    <svg class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 text-gray-900" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V5C15 6.10457 14.1046 7 13 7H11C9.89543 7 9 6.10457 9 5V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
+                    Quick Decision Guide
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                <div class="decision-guide-box rounded-lg p-4 sm:p-6 shadow-md">
+                    <h3 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2 text-gray-900">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-material-green" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 22V11L2 12V2H8.5C9.16304 2 9.79893 2.26339 10.2678 2.73123C10.7366 3.19907 11 3.83496 11 4.5V9H18C18.5304 9 19.0391 9.21071 19.4142 9.58579C19.7893 9.96086 20 10.4696 20 11V19C20 19.5304 19.7893 20.0391 19.4142 20.4142C19.0391 20.7893 18.5304 21 18 21H7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        What to Look For (Good Fund)
+                    </h3>
+                    <ul class="space-y-2 sm:space-y-3 text-sm sm:text-base md:text-lg text-gray-800">
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span><strong>CAGR &gt; 12%</strong> (for equity funds)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span><strong>Sharpe Ratio &gt; 1.5</strong></span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span><strong>Positive Alpha</strong> (preferably &gt; 2%)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span><strong>Max Drawdown &lt; 25%</strong></span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-material-green flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 12L11 15L16 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span><strong>Beta between 0.8-1.2</strong> (for most investors)</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="decision-guide-box rounded-lg p-4 sm:p-6 shadow-md">
+                    <h3 class="text-lg sm:text-xl font-bold mb-3 sm:mb-4 flex items-center gap-2 text-gray-900">
+                        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-red-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 2V13L22 12V22H15.5C14.837 22 14.2011 21.7366 13.7322 21.2688C13.2634 20.8009 13 20.165 13 19.5V15H6C5.46957 15 4.96086 14.7893 4.58579 14.4142C4.21071 14.0391 4 13.5304 4 13V5C4 4.46957 4.21071 3.96086 4.58579 3.58579C4.96086 3.21071 5.46957 3 6 3H17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        What to Avoid (Bad Fund)
+                    </h3>
+                    <ul class="space-y-2 sm:space-y-3 text-sm sm:text-base md:text-lg text-gray-800">
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span><strong>Negative Alpha</strong> (underperforming)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span><strong>Sharpe Ratio &lt; 0.5</strong></span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span><strong>Max Drawdown &gt; 40%</strong></span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span><strong>Very low AUM</strong> (&lt; 50 crores)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <path d="M15 9L9 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <span><strong>Consistently negative returns</strong></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Tips -->
+        <div class="tip-box p-4 sm:p-6 md:p-8 rounded-xl mt-6 sm:mt-8 mb-6 sm:mb-8">
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3">
+                <svg class="w-6 h-6 sm:w-8 sm:h-8 text-material-amber" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M12 8V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M12 16H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.3">
+                        <animate attributeName="opacity" values="0.3;0.8;0.3" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                </svg>
+                Pro Tips for Choosing the Best Fund
+            </h2>
+            <div class="space-y-3 sm:space-y-4 text-gray-800 text-sm sm:text-base md:text-lg">
+                <div class="flex items-start gap-3">
+                    <span class="material-icons text-material-amber text-xl mt-1">1</span>
+                    <div>
+                        <strong>Don't look at just one metric:</strong> A fund with high CAGR but terrible Sharpe Ratio might be too risky. 
+                        Look at the complete picture.
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="material-icons text-material-amber text-xl mt-1">2</span>
+                    <div>
+                        <strong>Match your risk profile:</strong> If you're young, you can take more risk (higher Beta, higher volatility). 
+                        If you're close to retirement, choose safer funds (lower Beta, lower drawdown).
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="material-icons text-material-amber text-xl mt-1">3</span>
+                    <div>
+                        <strong>Consistency matters:</strong> A fund that gives 15% CAGR consistently is better than one that gives 
+                        20% one year and 5% the next year.
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="material-icons text-material-amber text-xl mt-1">4</span>
+                    <div>
+                        <strong>Compare similar funds:</strong> Compare equity funds with equity funds, not with debt funds. 
+                        They have different risk profiles.
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="material-icons text-material-amber text-xl mt-1">5</span>
+                    <div>
+                        <strong>Past performance doesn't guarantee future:</strong> But it's the best indicator we have. 
+                        Use these metrics to make informed decisions.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-8 sm:mt-12 py-6 sm:py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
+                <div class="text-center md:text-left">
+                    <p class="text-xs sm:text-sm text-gray-600">Data provided by MFAPI.in | For educational purposes only</p>
+                    <p class="text-xs text-gray-500 mt-1">Free Mutual Fund Analysis Tool India | Compare MF Funds Online</p>
+                </div>
+                <a 
+                    href="index.html" 
+                    class="w-full sm:w-auto px-4 sm:px-6 py-2 bg-material-blue text-white rounded-lg text-sm sm:text-base font-medium hover:bg-material-blue-dark transition-colors flex items-center justify-center gap-2"
+                >
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Back to Analysis
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Chart.js configuration
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.font.size = window.innerWidth < 640 ? 11 : 14;
+        Chart.defaults.color = '#374151';
+        
+        // Update font size on resize
+        window.addEventListener('resize', () => {
+            Chart.defaults.font.size = window.innerWidth < 640 ? 11 : 14;
+        });
+
+        // CAGR Chart
+        const cagrCtx = document.getElementById('cagrChart').getContext('2d');
+        new Chart(cagrCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Fund A', 'Fund B', 'Fund C', 'Fund D'],
+                datasets: [{
+                    label: '3-Year CAGR (%)',
+                    data: [15.2, 12.8, 18.5, 10.3],
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(16, 185, 129)',
+                        'rgb(59, 130, 246)',
+                        'rgb(16, 185, 129)',
+                        'rgb(239, 68, 68)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Example: Higher CAGR means better growth',
+                        font: { size: window.innerWidth < 640 ? 12 : 16, weight: 'bold' }
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'CAGR (%)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Beta Chart
+        const betaCtx = document.getElementById('betaChart').getContext('2d');
+        new Chart(betaCtx, {
+            type: 'line',
+            data: {
+                labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6'],
+                datasets: [
+                    {
+                        label: 'Market (Beta = 1.0)',
+                        data: [100, 105, 110, 108, 115, 120],
+                        borderColor: 'rgb(156, 163, 175)',
+                        backgroundColor: 'rgba(156, 163, 175, 0.1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5]
+                    },
+                    {
+                        label: 'Fund with Beta 1.5 (More Risky)',
+                        data: [100, 107.5, 115, 112, 122.5, 130],
+                        borderColor: 'rgb(239, 68, 68)',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Fund with Beta 0.8 (Less Risky)',
+                        data: [100, 104, 108, 106.4, 112, 116],
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Example: How Beta affects fund movement vs market',
+                        font: { size: window.innerWidth < 640 ? 12 : 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Value (Indexed to 100)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Alpha Chart
+        const alphaCtx = document.getElementById('alphaChart').getContext('2d');
+        new Chart(alphaCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Fund A', 'Fund B', 'Fund C', 'Fund D'],
+                datasets: [{
+                    label: 'Alpha (%)',
+                    data: [3.5, -1.2, 5.8, -0.5],
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(16, 185, 129)',
+                        'rgb(239, 68, 68)',
+                        'rgb(16, 185, 129)',
+                        'rgb(239, 68, 68)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Example: Positive Alpha = Beating the market (Good!)',
+                        font: { size: window.innerWidth < 640 ? 12 : 16, weight: 'bold' }
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Alpha (%)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Sharpe Ratio Chart
+        const sharpeCtx = document.getElementById('sharpeChart').getContext('2d');
+        new Chart(sharpeCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Fund A', 'Fund B', 'Fund C', 'Fund D'],
+                datasets: [{
+                    label: 'Sharpe Ratio',
+                    data: [2.1, 0.8, 1.9, 0.4],
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(16, 185, 129)',
+                        'rgb(245, 158, 11)',
+                        'rgb(16, 185, 129)',
+                        'rgb(239, 68, 68)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Example: Sharpe > 1 is good, > 2 is excellent',
+                        font: { size: window.innerWidth < 640 ? 12 : 16, weight: 'bold' }
+                    },
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Sharpe Ratio'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Maximum Drawdown Chart
+        const drawdownCtx = document.getElementById('drawdownChart').getContext('2d');
+        new Chart(drawdownCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [
+                    {
+                        label: 'Fund Value',
+                        data: [100, 105, 110, 95, 100, 115, 120, 110, 125, 130, 135, 140],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true
+                    },
+                    {
+                        label: 'Peak Value',
+                        data: [100, 105, 110, 110, 110, 115, 120, 120, 125, 130, 135, 140],
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Example: Maximum Drawdown = Biggest drop from peak (Lower is better)',
+                        font: { size: window.innerWidth < 640 ? 12 : 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Fund Value'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Standard Deviation Chart
+        const stdDevCtx = document.getElementById('stdDevChart').getContext('2d');
+        new Chart(stdDevCtx, {
+            type: 'line',
+            data: {
+                labels: ['Month 1', 'Month 2', 'Month 3', 'Month 4', 'Month 5', 'Month 6', 'Month 7', 'Month 8', 'Month 9', 'Month 10', 'Month 11', 'Month 12'],
+                datasets: [
+                    {
+                        label: 'Low Volatility Fund (Std Dev = 12%)',
+                        data: [100, 102, 101, 103, 102, 104, 103, 105, 104, 106, 105, 107],
+                        borderColor: 'rgb(16, 185, 129)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        fill: true
+                    },
+                    {
+                        label: 'High Volatility Fund (Std Dev = 25%)',
+                        data: [100, 98, 105, 95, 110, 92, 108, 97, 112, 94, 115, 107],
+                        borderColor: 'rgb(239, 68, 68)',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Example: Lower Standard Deviation = Smoother, more stable returns',
+                        font: { size: window.innerWidth < 640 ? 12 : 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Fund Value'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
