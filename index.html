@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>India Mutual Fund Analysis</title>
+    
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Google Material Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="./src/style.css">
+</head>
+<body class="font-roboto bg-gray-50">
+    <div id="app">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+            <div class="container mx-auto px-4 py-6">
+                <div class="flex items-center gap-3">
+                    <span class="material-icons text-4xl">trending_up</span>
+                    <div>
+                        <h1 class="text-3xl font-bold">India Mutual Fund Analysis</h1>
+                        <p class="text-blue-100 text-sm mt-1">Compare and analyze mutual funds in real-time</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Fund Selection Section -->
+            <section class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+                    <span class="material-icons text-blue-600">search</span>
+                    Select Mutual Funds
+                </h2>
+                
+                <div class="relative mb-4">
+                    <input 
+                        type="text" 
+                        id="fundSearch" 
+                        placeholder="Search for mutual funds..." 
+                        class="w-full px-4 py-3 pl-12 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg"
+                    >
+                    <span class="material-icons absolute left-4 top-3.5 text-gray-400">search</span>
+                </div>
+                
+                <div id="fundList" class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+                    <div class="p-4 text-center text-gray-500">
+                        <span class="material-icons text-4xl mb-2">hourglass_empty</span>
+                        <p>Loading funds...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Selected Funds Section -->
+            <section id="selectedFundsSection" class="hidden mb-6">
+                <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+                    <span class="material-icons text-blue-600">list</span>
+                    Selected Funds
+                </h2>
+                <div id="selectedFunds" class="flex flex-wrap gap-3"></div>
+            </section>
+
+            <!-- Comparison Table Section -->
+            <section id="comparisonSection" class="hidden">
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+                        <span class="material-icons text-blue-600">compare_arrows</span>
+                        Performance Comparison
+                    </h2>
+                    
+                    <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <h3 class="text-sm font-semibold text-blue-800 mb-2 flex items-center gap-2">
+                            <span class="material-icons text-lg">info</span>
+                            Understanding the Metrics (All metrics calculated for 3-year period)
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-blue-700">
+                            <div><strong>CAGR (3Y):</strong> 3-Year Compound Annual Growth Rate</div>
+                            <div><strong>AUM:</strong> Assets Under Management (in Crores)</div>
+                            <div><strong>Beta:</strong> Volatility vs market (1.0 = market avg, &lt;1 = less volatile)</div>
+                            <div><strong>Alpha:</strong> Excess return over benchmark (positive = outperformance)</div>
+                            <div><strong>Sharpe (3Y):</strong> Risk-adjusted return (higher better, &gt;1 is good)</div>
+                            <div><strong>Sortino (3Y):</strong> Downside risk-adjusted return (better than Sharpe)</div>
+                            <div><strong>Treynor (3Y):</strong> Return per unit of systematic risk (Beta)</div>
+                            <div><strong>Max Drawdown:</strong> Largest peak-to-trough decline (lower is better)</div>
+                            <div><strong>Std Dev (3Y):</strong> Volatility measure (lower = less risky)</div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table id="comparisonTable" class="w-full text-sm">
+                            <thead>
+                                <tr class="bg-gray-100 border-b-2 border-gray-300">
+                                    <th class="px-3 py-3 text-left font-semibold text-gray-700 min-w-[200px]">Fund Name</th>
+                                    <th class="px-2 py-3 text-center font-semibold text-gray-700 cursor-help" title="3-Year Compound Annual Growth Rate">CAGR (3Y)</th>
+                                    <th class="px-2 py-3 text-center font-semibold text-gray-700 cursor-help" title="Assets Under Management in Crores">AUM</th>
+                                    <th class="px-2 py-3 text-center font-semibold text-gray-700 cursor-help" title="Volatility relative to market">Beta</th>
+                                    <th class="px-2 py-3 text-center font-semibold text-gray-700 cursor-help" title="Alpha - Excess return over benchmark">Alpha</th>
+                                    <th class="px-2 py-3 text-center font-semibold text-gray-700 cursor-help" title="Sharpe Ratio (3Y) - Risk-adjusted return">Sharpe</th>
+                                    <th class="px-2 py-3 text-center font-semibold text-gray-700 cursor-help" title="Sortino Ratio (3Y) - Downside risk-adjusted">Sortino</th>
+                                    <th class="px-2 py-3 text-center font-semibold text-gray-700 cursor-help" title="Treynor Ratio (3Y) - Return per unit of Beta">Treynor</th>
+                                    <th class="px-2 py-3 text-center font-semibold text-gray-700 cursor-help" title="Maximum Drawdown - Largest decline">Max DD</th>
+                                    <th class="px-2 py-3 text-center font-semibold text-gray-700 cursor-help" title="Standard Deviation (3Y) - Volatility">Std Dev</th>
+                                    <th class="px-2 py-3 text-center font-semibold text-gray-700">Rating</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparisonTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Visual Comparison Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <span class="material-icons text-green-600">show_chart</span>
+                            CAGR (3Y) Comparison
+                        </h3>
+                        <div id="cagrChart" class="h-64"></div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <span class="material-icons text-purple-600">bar_chart</span>
+                            Sharpe Ratio (3Y) Comparison
+                        </h3>
+                        <div id="sharpeChart" class="h-64"></div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <span class="material-icons text-orange-600">trending_down</span>
+                            Alpha Comparison
+                        </h3>
+                        <div id="alphaChart" class="h-64"></div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <span class="material-icons text-red-600">warning</span>
+                            Maximum Drawdown Comparison
+                        </h3>
+                        <div id="drawdownChart" class="h-64"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg p-8 flex flex-col items-center gap-4">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                    <p class="text-lg font-medium">Loading fund data...</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white mt-12 py-6">
+            <div class="container mx-auto px-4 text-center">
+                <p class="text-gray-400">Data provided by MFAPI.in | For educational purposes only</p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html>
+
